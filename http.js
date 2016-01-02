@@ -1,21 +1,24 @@
 var http = require('http');
-var fs = require('fs');
 var url = require('url');
+var express = require('express');
+var bodyParser = require('body-parser');
+var app = express();
+var querystring = require('querystring');
 
 
-//var buf = fs.readFileSync('home.html');
 
-//var str = buf.toString();
+app.use(bodyParser.json());
+app.use(bodyParser.raw());
+app.use(bodyParser.text());
+app.use(bodyParser.urlencoded({extended: true}));
+
+app.listen(8000);
 
 
-http.createServer(function (req, res){
-    req.on('data', function(chunk){
-	console.log(chunk);
 
-    });
+app.post('/', function(req, res){
+	console.log(req.body.sensorNumber);
+	console.log(req.body.temperature);
 
-    res.writeHead(200, {'Content-Type': 'text/plain'});
-    res.end('Hello World!');
-}).listen(8000);
 
-console.log('Listening to port 8000.');
+});

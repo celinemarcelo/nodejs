@@ -1,9 +1,10 @@
 var put = function(sensorNumber, temperature){
     var AWS = require('aws-sdk');
     var moment = require('moment-timezone');
-    
-    AWS.config.update({region: 'ap-northeast-1', 
-		       endpoint: 'https://dynamodb.ap-northeast-1.amazonaws.com'});
+    var conf = require('./conf');
+
+    AWS.config.update({region: conf.get('region'), 
+		       endpoint: conf.get('endpoint')});
     
     var docClient = new AWS.DynamoDB.DocumentClient();
     

@@ -12,3 +12,5 @@ var conf = convict({
 	default: 'https://dynamodb.ap-northeast-1.amazonaws.com'
     }
 });
+
+module.exports = conf;

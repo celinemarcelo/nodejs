@@ -1,14 +1,14 @@
 <!-- views/pages/index.ejs -->
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <% include ../partials/head %>
+   
   </head>
   <body class="container">    
     <main>
       <div class="jumbotron">
-	<table class="table-striped" width="100%">
+	<table class="table-striped" width="100%" style="font-size: 15px">
 	  <tr>
 	    <th>Sensor Number</th>
 	    <th>Temperature</th>
@@ -21,9 +21,10 @@
 	    <td> <%= data.timestamp %> </td>
 	  </tr>
 	  <% }); %>
-	</table>
-
+	</table>    
     </main>
-        
+    <script> 
+      $.getScript();
+    </script>
   </body>
 </html>

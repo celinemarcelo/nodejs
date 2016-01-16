@@ -8,8 +8,6 @@ app.listen(8002);
 
 app.set('view engine', 'ejs');
 
-
-
 app.get('/', function(req, res){
     scan();
     var data = jsonfile.readFileSync('data.json');

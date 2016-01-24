@@ -5,8 +5,6 @@ var express = require('express');
 
 var app = express();
 
-var results;
-
 app.listen(8002);
 
 AWS.config.update({
@@ -28,10 +26,9 @@ app.get('/', function(req, res) {
         } else {
             //console.log("The Scan call evaluated " + data.ScannedCount + " items");
             //console.log(data); // successful response
-            results = data.Items;
-            fs.writeFile('data.json', JSON.stringify(data.Items, null, 4));
-            console.log(results);
-            res.send(results);
+            //fs.writeFile('data.json', JSON.stringify(data.Items, null, 4));
+            console.log(data.Items);
+            res.send(data.Items);
         }
     });
 });

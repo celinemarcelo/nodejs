@@ -1,7 +1,7 @@
 var put = function(sensorNumber, temperature){
     var AWS = require('aws-sdk');
     var moment = require('moment-timezone');
-    var conf = require('./conf');
+    var conf = require('./config');
 
     AWS.config.update({region: conf.get('region'), 
 		       endpoint: conf.get('endpoint')});

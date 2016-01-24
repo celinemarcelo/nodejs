@@ -6,11 +6,10 @@ AWS.config.update({region:'ap-northeast-1',
 var docClient = new AWS.DynamoDB.DocumentClient();
 
 var params = {
-    TableName: 'SensorRecords',
-    Limit: 5  // Limits the number of results per page (beyond the default 1MB limit)
+    TableName: 'SensorRecords'
 };
 
-console.log("Calling the Scan API on the Image table");
+
 docClient.scan(params, function(err, data) {
     if (err) {
         console.log(err); // an error occurred

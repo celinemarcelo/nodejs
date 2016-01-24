@@ -1,0 +1,29 @@
+<!-- views/pages/index.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <% include ../partials/head %>
+  </head>
+  <body class="container">    
+    <main>
+      <div class="jumbotron">
+	<table class="table-striped" width="100%">
+	  <th>
+	    <td>Sensor Number</td>
+	    <td>Temperature</td>
+	    <td>Timestamp</td>
+	  </th>
+	  <% data.forEach(function(data) { %>
+          <tr>
+	    <td> <%= data.sensorNumber %> </td>
+	    <td> <%= data.temperature %> </td>
+	    <td> <%= data.timestamp %> </td>
+	  </tr>
+	  <% }); %>
+	</table>
+
+    </main>
+        
+  </body>
+</html>

@@ -24,10 +24,7 @@ app.get('/', function(req, res) {
         if (err) {
             console.log(err); // an error occurred
         } else {
-            //console.log("The Scan call evaluated " + data.ScannedCount + " items");
-            //console.log(data); // successful response
-            //fs.writeFile('data.json', JSON.stringify(data.Items, null, 4));
-            console.log(data.Items);
+            console.log(req);
             res.send(data.Items);
         }
     });

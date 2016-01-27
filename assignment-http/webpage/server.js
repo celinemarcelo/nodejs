@@ -1,6 +1,9 @@
 var express = require('express');
 var jsonfile = require('jsonfile');
 var http = require('http');
+var is = require('type-is')
+
+var results = "";
 
 var app = express();
 
@@ -19,23 +22,19 @@ var options = {
 
 app.get('/', function(req, response) {
 	http.request(options, function(res) {
-		//console.log(res);
 		res.on('data', function(chunk) {
-			//console.log(chunk);
-
 			results += chunk;
-			console.log("---------------------");
-			console.log(results);
 		});
+
+		res.on('end', function() {
+			response.render('pages/index', {
+				data: JSON.parse(results)
+			});
+		});
+
 
 
 	}).end();
 
 	//console.log("DITO" + results);
-
-	//response.render('pages/index', {
-	//	data: data
-	//});
-
-
 });

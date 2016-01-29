@@ -31,10 +31,5 @@ app.get('/', function(req, response) {
 				data: JSON.parse(results)
 			});
 		});
-
-
-
 	}).end();
-
-	//console.log("DITO" + results);
 });

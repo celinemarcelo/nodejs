@@ -15,12 +15,19 @@ AWS.config.update({
 var docClient = new AWS.DynamoDB.DocumentClient();
 
 var params = {
-    TableName: 'SensorRecords'
+    TableName: "SensorRecords",
+    KeyConditionExpression: "#snum > :zro",
+    ExpressionAttributeNames: {
+        "#snum": "sensorNumber"
+    },
+    ExpressionAttributeValues: {
+        ":zro": 0
+    }
 };
 
 
 app.get('/', function(req, res) {
-    docClient.scan(params, function(err, data) {
+    docClient.query(params, function(err, data) {
         if (err) {
             console.log(err); // an error occurred
         } else {

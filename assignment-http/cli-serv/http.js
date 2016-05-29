@@ -12,6 +12,7 @@ app.listen(8001);
 app.post('/', function(req, res){
     //console.log(req.body.sensorNumber);
     //console.log(req.body.temperature);
+    console.log(req);
     require('./put')(Number(req.body.sensorNumber), Number(req.body.temperature));
 });
 

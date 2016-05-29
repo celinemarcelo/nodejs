@@ -37,12 +37,20 @@ app.post('/v1/users', function(req, res) {
 		registrationDate: new Date()
 	};
 
-	connection.query('INSERT INTO Users SET ?', merge(req.body, timestamp), function(err, result) {
-		if (!err) {
-			res.send('Query successful.');
-			connection.end();
+	connection.query('SELECT * from Users WHERE username = ' + "'" + req.body.username + "'", function(err, results) {
+		if (results.length > 0) {
+			console.log('Username already taken!');
 		} else {
-			console.log('Error while performing Query.');
+			connection.query('INSERT INTO Users SET ?', merge(req.body, timestamp), function(err, result) {
+				if (!err) {
+					res.send('Query successful.');
+					connection.end();
+				} else {
+					console.log('Error while performing Query.');
+				}
+			});
 		}
+
 	});
+
 });

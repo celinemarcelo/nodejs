@@ -20,14 +20,14 @@ app.get('/v1/users', function(req, res) {
 
 	connection.query('SELECT * from Users', function(err, rows, fields) {
 		if (!err) {
+			res.statusCode = 200;
+
 			res.send(rows);
 			connection.end();
 		} else {
 			console.log('Error while performing Query.');
 		}
 	});
-
-
 });
 
 app.post('/v1/users', function(req, res) {
@@ -53,4 +53,18 @@ app.post('/v1/users', function(req, res) {
 
 	});
 
+});
+
+app.delete('/v1/users', function(req, res) {
+	connection.connect();
+
+	connection.query('TRUNCATE Users', function(err) {
+		if (!err) {
+			res.statusCode = 200;
+			res.send('All Users deleted.');
+			connection.end();
+		} else {
+			console.log('Error while performing Query.');
+		}
+	});
 });

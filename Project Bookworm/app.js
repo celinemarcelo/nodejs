@@ -40,12 +40,14 @@ app.route('/v1/users')
 
 		connection.query('SELECT * from Users WHERE username = ' + "'" + req.body.username + "'", function(err, results) {
 			if (results.length > 0) {
-				console.log('Username already taken!');
+				res.send({
+					"message": "Username already taken."
+				});
 			} else {
 				connection.query('INSERT INTO Users SET ?', merge(req.body, timestamp), function(err, results) {
 					if (!err) {
 						res.send({
-							"success": "ok",
+							"message": "success",
 							"userId": results.insertId
 						});
 						connection.end();
@@ -65,7 +67,7 @@ app.route('/v1/users')
 		connection.query('TRUNCATE Users', function(err) {
 			if (!err) {
 				res.send({
-					"success": "ok"
+					"message": "success"
 				});
 				connection.end();
 			} else {
@@ -80,7 +82,7 @@ app.route('/v1/users')
 		connection.query('TRUNCATE Users', function(err) {
 			if (!err) {
 				res.send({
-					"success": "ok"
+					"message": "success"
 				});
 				connection.end();
 			} else {

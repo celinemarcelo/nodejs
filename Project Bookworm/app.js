@@ -56,11 +56,11 @@ app.route('/v1/users')
 		};
 
 		connection.query('SELECT * from Users WHERE username = ' + "'" + req.body.username + "'", function(err, results) {
-			if (results.length > 0) {
+			if (results.length) {
 				res.send({
 					"message": "Username already taken."
 				});
-			} else {
+			} else if (!results.length) {
 				connection.query('INSERT INTO Users SET ?', merge(req.body, timestamp), function(err, results) {
 					if (!err) {
 						res.send({
@@ -75,7 +75,12 @@ app.route('/v1/users')
 						});
 					}
 				});
-			}
+			} else if (err) {
+				console.log('Error while performing query.');
+				res.send({
+					"message": "There has been a problem with the server."
+				});
+			} 
 
 		});
 

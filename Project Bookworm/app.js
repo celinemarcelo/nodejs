@@ -28,6 +28,7 @@ app.route('/v1/users')
 				//connection.end();
 			} else {
 				console.log('Error while performing query.');
+				res.send('There has been a problem with the server.');
 			}
 		});
 	})
@@ -54,6 +55,7 @@ app.route('/v1/users')
 						//connection.end();
 					} else {
 						console.log('Error while performing query.');
+						res.send('There has been a problem with the server.');
 					}
 				});
 			}
@@ -73,6 +75,7 @@ app.route('/v1/users')
 				//connection.end();
 			} else {
 				console.log('Error while performing query.');
+				res.send('There has been a problem with the server.');
 			}
 		});
 	})
@@ -88,6 +91,27 @@ app.route('/v1/users')
 				//connection.end();
 			} else {
 				console.log('Error while performing query.');
+				res.send('There has been a problem with the server.');
 			}
 		});
 	});
+
+
+
+app.get('/v1/users/:userId', function(req, res) {
+	//connection.connect();
+
+	connection.query('SELECT * from Users WHERE userId = ' + req.params.userId, function(err, rows, fields) {
+		if (!err) {
+			console.log(req.params.userId);
+
+			res.send({
+				"user": rows
+			});
+			//connection.end();
+		} else {
+			console.log('Error while performing query.');
+			res.send('There has been a problem with the server.');
+		}
+	});
+});	

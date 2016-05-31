@@ -15,16 +15,17 @@ app.use(bodyParser.json());
 
 app.listen(8004);
 
+
 app.route('/v1/users')
 	.get(function(req, res) {
-		connection.connect();
+		//connection.connect();
 
 		connection.query('SELECT * from Users', function(err, rows, fields) {
 			if (!err) {
 				res.send({
 					"users": rows
 				});
-				connection.end();
+				//connection.end();
 			} else {
 				console.log('Error while performing query.');
 			}
@@ -32,7 +33,7 @@ app.route('/v1/users')
 	})
 
 	.post(function(req, res) {
-		connection.connect();
+		//connection.connect();
 
 		var timestamp = {
 			registrationDate: new Date()
@@ -50,7 +51,7 @@ app.route('/v1/users')
 							"message": "success",
 							"userId": results.insertId
 						});
-						connection.end();
+						//connection.end();
 					} else {
 						console.log('Error while performing query.');
 					}
@@ -62,14 +63,14 @@ app.route('/v1/users')
 	})
 
 	.put(function(req, res) {
-		connection.connect();
+		//connection.connect();
 
 		connection.query('TRUNCATE Users', function(err) {
 			if (!err) {
 				res.send({
 					"message": "success"
 				});
-				connection.end();
+				//connection.end();
 			} else {
 				console.log('Error while performing query.');
 			}
@@ -77,14 +78,14 @@ app.route('/v1/users')
 	})
 
 	.delete(function(req, res) {
-		connection.connect();
+		//connection.connect();
 
 		connection.query('TRUNCATE Users', function(err) {
 			if (!err) {
 				res.send({
 					"message": "success"
 				});
-				connection.end();
+				//connection.end();
 			} else {
 				console.log('Error while performing query.');
 			}

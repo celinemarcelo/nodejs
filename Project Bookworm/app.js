@@ -15,56 +15,76 @@ app.use(bodyParser.json());
 
 app.listen(8004);
 
-app.get('/v1/users', function(req, res) {
-	connection.connect();
+app.route('/v1/users')
+	.get(function(req, res) {
+		connection.connect();
 
-	connection.query('SELECT * from Users', function(err, rows, fields) {
-		if (!err) {
-			res.statusCode = 200;
+		connection.query('SELECT * from Users', function(err, rows, fields) {
+			if (!err) {
+				res.send({
+					"users": rows
+				});
+				connection.end();
+			} else {
+				console.log('Error while performing query.');
+			}
+		});
+	})
 
-			res.send(rows);
-			connection.end();
-		} else {
-			console.log('Error while performing Query.');
-		}
+	.post(function(req, res) {
+		connection.connect();
+
+		var timestamp = {
+			registrationDate: new Date()
+		};
+
+		connection.query('SELECT * from Users WHERE username = ' + "'" + req.body.username + "'", function(err, results) {
+			if (results.length > 0) {
+				console.log('Username already taken!');
+			} else {
+				connection.query('INSERT INTO Users SET ?', merge(req.body, timestamp), function(err, results) {
+					if (!err) {
+						res.send({
+							"success": "ok",
+							"userId": results.insertId
+						});
+						connection.end();
+					} else {
+						console.log('Error while performing query.');
+					}
+				});
+			}
+
+		});
+
+	})
+
+	.put(function(req, res) {
+		connection.connect();
+
+		connection.query('TRUNCATE Users', function(err) {
+			if (!err) {
+				res.send({
+					"success": "ok"
+				});
+				connection.end();
+			} else {
+				console.log('Error while performing query.');
+			}
+		});
+	})
+
+	.delete(function(req, res) {
+		connection.connect();
+
+		connection.query('TRUNCATE Users', function(err) {
+			if (!err) {
+				res.send({
+					"success": "ok"
+				});
+				connection.end();
+			} else {
+				console.log('Error while performing query.');
+			}
+		});
 	});
-});
-
-app.post('/v1/users', function(req, res) {
-	connection.connect();
-
-	var timestamp = {
-		registrationDate: new Date()
-	};
-
-	connection.query('SELECT * from Users WHERE username = ' + "'" + req.body.username + "'", function(err, results) {
-		if (results.length > 0) {
-			console.log('Username already taken!');
-		} else {
-			connection.query('INSERT INTO Users SET ?', merge(req.body, timestamp), function(err, result) {
-				if (!err) {
-					res.send('Query successful.');
-					connection.end();
-				} else {
-					console.log('Error while performing Query.');
-				}
-			});
-		}
-
-	});
-
-});
-
-app.delete('/v1/users', function(req, res) {
-	connection.connect();
-
-	connection.query('TRUNCATE Users', function(err) {
-		if (!err) {
-			res.statusCode = 200;
-			res.send('All Users deleted.');
-			connection.end();
-		} else {
-			console.log('Error while performing Query.');
-		}
-	});
-});

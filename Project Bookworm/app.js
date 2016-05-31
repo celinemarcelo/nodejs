@@ -28,7 +28,9 @@ app.route('/v1/users')
 				//connection.end();
 			} else {
 				console.log('Error while performing query.');
-				res.send('There has been a problem with the server.');
+				res.send({
+					"message": "There has been a problem with the server."
+				});
 			}
 		});
 	})
@@ -55,7 +57,9 @@ app.route('/v1/users')
 						//connection.end();
 					} else {
 						console.log('Error while performing query.');
-						res.send('There has been a problem with the server.');
+						res.send({
+							"message": "There has been a problem with the server."
+						});
 					}
 				});
 			}
@@ -75,7 +79,9 @@ app.route('/v1/users')
 				//connection.end();
 			} else {
 				console.log('Error while performing query.');
-				res.send('There has been a problem with the server.');
+				res.send({
+					"message": "There has been a problem with the server."
+				});
 			}
 		});
 	})
@@ -91,7 +97,9 @@ app.route('/v1/users')
 				//connection.end();
 			} else {
 				console.log('Error while performing query.');
-				res.send('There has been a problem with the server.');
+				res.send({
+					"message": "There has been a problem with the server."
+				});
 			}
 		});
 	});
@@ -111,7 +119,9 @@ app.route('/v1/users/:userId')
 				//connection.end();
 			} else {
 				console.log('Error while performing query.');
-				res.send('There has been a problem with the server.');
+				res.send({
+					"message": "There has been a problem with the server."
+				});
 			}
 		});
 	})
@@ -119,24 +129,33 @@ app.route('/v1/users/:userId')
 	.post(function(req, res) {
 		//connection.connect();
 
-		connection.query('UPDATE Users SET ? WHERE userId = ' + req.params.userId, req.body, function(err, rows, fields) {
-			if (!err) {
-				connection.query('SELECT * from Users WHERE userId = ' + req.params.userId, function(err, rows, fields) {
+		connection.query('UPDATE Users SET ? WHERE userId = ' + req.params.userId, req.body, function(err, results) {
+			if (results.affectedRows) {
+				connection.query('SELECT * from Users WHERE userId = ' + req.params.userId, function(err, rows) {
 					if (!err) {
-						console.log(req.params.userId);
-
 						res.send({
 							"user": rows
 						});
 						//connection.end();
 					} else {
 						console.log('Error while performing query.');
-						res.send('There has been a problem with the server.');
+						res.send({
+							"message": "There has been a problem with the server."
+						});
 					}
 				});
-			} else {
+			} else if (!results.affectedRows){
+				console.log('There are no users with the requested userId.');
+				res.send({
+					"message": "There are no users with the requested userId."
+				});
+			} else if (err){
 				console.log('Error while performing query.');
-				res.send('There has been a problem with the server.');
+				res.send({
+					"message": "There has been a problem with the server."
+				});
 			}
 		});
 	});
+
+	

@@ -21,12 +21,17 @@ app.route('/v1/users')
 		//connection.connect();
 
 		connection.query('SELECT * from Users', function(err, rows, fields) {
-			if (!err) {
+			if (rows.length) {
 				res.send({
 					"users": rows
 				});
 				//connection.end();
-			} else {
+			} else if (!rows.length){
+				console.log('There are no registered users.');
+				res.send({
+					"message": "There are no registered users."
+				});
+			} else if (err){
 				console.log('Error while performing query.');
 				res.send({
 					"message": "There has been a problem with the server."
@@ -111,8 +116,6 @@ app.route('/v1/users/:userId')
 
 		connection.query('SELECT * from Users WHERE userId = ' + req.params.userId, function(err, rows, fields) {
 			if (!err) {
-				console.log(req.params.userId);
-
 				res.send({
 					"user": rows
 				});
@@ -126,7 +129,7 @@ app.route('/v1/users/:userId')
 		});
 	})
 
-	.post(function(req, res) {
+	.put(function(req, res) {
 		//connection.connect();
 
 		connection.query('UPDATE Users SET ? WHERE userId = ' + req.params.userId, req.body, function(err, results) {
@@ -134,6 +137,7 @@ app.route('/v1/users/:userId')
 				connection.query('SELECT * from Users WHERE userId = ' + req.params.userId, function(err, rows) {
 					if (!err) {
 						res.send({
+							"message": "success",
 							"user": rows
 						});
 						//connection.end();

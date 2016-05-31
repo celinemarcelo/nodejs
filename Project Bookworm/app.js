@@ -24,6 +24,8 @@ app.route('/v1/users')
 
 		if (req.query.count != undefined) {
 			limit  = ' LIMIT ' + req.query.count.toString();
+		} else if (req.query.offset != undefined && req.query.limit != undefined){
+			limit = ' LIMIT ' + req.query.offset.toString() + ',' + req.query.limit.toString();
 		}
 
 		connection.query('SELECT * from Users' + limit, function(err, rows, fields) {

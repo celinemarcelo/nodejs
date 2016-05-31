@@ -20,7 +20,13 @@ app.route('/v1/users')
 	.get(function(req, res) {
 		//connection.connect();
 
-		connection.query('SELECT * from Users', function(err, rows, fields) {
+		var limit = '';
+
+		if (req.query.count != undefined) {
+			limit  = ' LIMIT ' + req.query.count.toString();
+		}
+
+		connection.query('SELECT * from Users' + limit, function(err, rows, fields) {
 			if (rows.length) {
 				res.send({
 					"users": rows
@@ -73,24 +79,6 @@ app.route('/v1/users')
 
 	})
 
-	.put(function(req, res) {
-		//connection.connect();
-
-		connection.query('TRUNCATE Users', function(err) {
-			if (!err) {
-				res.send({
-					"message": "success"
-				});
-				//connection.end();
-			} else {
-				console.log('Error while performing query.');
-				res.send({
-					"message": "There has been a problem with the server."
-				});
-			}
-		});
-	})
-
 	.delete(function(req, res) {
 		//connection.connect();
 
@@ -115,12 +103,17 @@ app.route('/v1/users/:userId')
 		//connection.connect();
 
 		connection.query('SELECT * from Users WHERE userId = ' + req.params.userId, function(err, rows, fields) {
-			if (!err) {
+			if (rows.length) {
 				res.send({
 					"user": rows
 				});
 				//connection.end();
-			} else {
+			} else if (!rows.length){
+				console.log('There are no users with the requested userId.');
+				res.send({
+					"message": "There are no users with the requested userId."
+				});
+			} else if (err){
 				console.log('Error while performing query.');
 				res.send({
 					"message": "There has been a problem with the server."
@@ -160,6 +153,22 @@ app.route('/v1/users/:userId')
 				});
 			}
 		});
-	});
+	})
 
-	
+	.delete(function(req, res) {
+		//connection.connect();
+
+		connection.query('DELETE FROM Users WHERE userId = ' + req.params.userId, function(err) {
+			if (!err) {
+				res.send({
+					"message": "success"
+				});
+				//connection.end();
+			} else {
+				console.log('Error while performing query.');
+				res.send({
+					"message": "There has been a problem with the server."
+				});
+			}
+		});
+	});

@@ -1,5 +1,6 @@
 var express = require('express');
-var bodyParser = require('body-parser')
+var bodyParser = require('body-parser');
+var url = require('url');
 var conf = require('./config');
 var merge = require('merge');
 var mysql = require('mysql');
@@ -18,6 +19,81 @@ var map_table = function(table) {
 		return table.charAt(0).toUpperCase() + table.slice(1);
 	} else if (table === 'reviewcomments') {
 		return 'ReviewComments';
+	}
+}
+
+var build_body = function(req) {
+	var set = ['books', 'authors', 'categories', 'languages', 'reviews'];
+
+	var timestamp = {
+		'timestamp': new Date()
+	};
+
+	var registrationDate = {
+		'registrationDate': new Date()		
+	};
+
+	if (set.indexOf(req.params.table) > -1){
+		return req.body;
+	} else if (req.params.table === 'favorites' || req.params.table === 'reviewcomments') {
+		return merge(req.body, timestamp);
+	} else if (req.params.table === 'users') {
+		return merge(req.body, registrationDate);
+	}
+}
+
+var build_args = function(req) {
+	var t = req.params.table
+
+	switch(t) {
+		case 'users':
+			return {'username': req.body.username};
+			break;
+		case 'books':
+			return {'title': req.body.title, 'author': req.body.author};
+			break;
+		case 'authors':
+			return {'firstName': req.body.firstName, 'lastName': req.body.lastName};
+			break;
+		case 'categories':
+			return {'categoryName': req.body.categoryName};
+			break;
+		case 'languages':
+			return {'language': req.body.language};
+			break;
+		case 'favorites':
+			return {'user': req.body.user, 'book': req.body.book};
+	}
+}
+
+var build_id = function(req) {
+	var t = req.params.table
+
+	switch (t) {
+		case 'users':
+			return {'userId': req.params.id};
+			break;
+		case 'books':
+			return {'bookId': req.params.id};
+			break;
+		case 'authors':
+			return {'authorId': req.params.id};
+			break;
+		case 'favorites':
+			return {'favoriteId': req.params.id};
+			break;
+		case 'categories':
+			return {'categoryId': req.params.id};
+			break;
+		case 'languages':
+			return {'languageId': req.params.id};
+			break;
+		case 'reviewcomments':
+			return {'reviewCommentId': req.params.id};
+			break;
+		case 'reviews':
+			return {'reviewId': req.params.id};
+			break;
 	}
 }
 
@@ -66,11 +142,14 @@ app.route('/v1/:table')
 	.post(function(req, res) {
 		//connection.connect();
 
-		var timestamp = {
-			registrationDate: new Date()
-		};
+		var table = map_table(req.params.table);
+		var body = build_body(req);
+		var args = build_args(req);
 
-		connection.query('SELECT * from Users WHERE ?', {'username': req.body.username}, function(err, results) {
+		console.log(body);
+		
+
+		connection.query('SELECT * from ' + table + ' WHERE ?', args, function(err, results) {
 			if (err) {
 				console.log('Error while performing query.');
 				res.send({
@@ -78,15 +157,24 @@ app.route('/v1/:table')
 					'errno': err.errno
 				});
 			} else if (results.length) {
+				var msg;
+
+				if (table === 'Categories') {
+					msg = 'Category';
+				} else {
+					msg = table.slice(0, table.length - 1);
+				}
+
 				res.send({
-					'message': 'Username already taken.'
+					'message':  msg + ' already exists.'
 				}); 
 			} else if (!results.length) {
-				connection.query('INSERT INTO Users SET ?', merge(req.body, timestamp), function(err, results) {
+				connection.query('INSERT INTO ' + table + ' SET ?', body, function(err, results) {
+
 					if (!err) {
 						res.send({
 							'message': 'success',
-							'userId': results.insertId
+							'id': results.insertId
 						});
 						//connection.end();
 					} else {
@@ -106,7 +194,6 @@ app.route('/v1/:table')
 
 		var table = map_table(req.params.table);
 
-
 		connection.query('TRUNCATE ' + table, function(err) {
 			if (!err) {
 				res.send({
@@ -125,27 +212,30 @@ app.route('/v1/:table')
 	});
 
 
-app.route('/v1/users/:userId')
+app.route('/v1/:table/:id')
 	.get(function(req, res) {
 		//connection.connect();
 
-		connection.query('SELECT * from Users WHERE ?', req.params, function(err, rows, fields) {
-			if (rows.length) {
-				res.send({
-					'user': rows
-				});
-				//connection.end();
-			} else if (!rows.length){
-				console.log('There are no users with the requested userId.');
-				res.send({
-					'message': 'There are no users with the requested userId.'
-				});
-			} else if (err){
+		var table = map_table(req.params.table);
+		var id = build_id(req);
+		
+
+		connection.query('SELECT * from ' + table + ' WHERE ?', id, function(err, rows, fields) {
+			 if (err){
 				console.log('Error while performing query.');
 				res.send({
 					'message': 'There has been a problem with the server.',
 					'errno': err.errno
 
+				});
+			} if (rows.length) {
+				res.send(rows);
+				//connection.end();
+
+			} else if (!rows.length){
+				console.log('There are no ' + req.params.table + ' with the requested id.');
+				res.send({
+					'message': 'There are no ' + req.params.table + ' with the requested id.'
 				});
 			}
 		});
@@ -154,13 +244,23 @@ app.route('/v1/users/:userId')
 	.put(function(req, res) {
 		//connection.connect();
 
-		connection.query('UPDATE Users SET ? WHERE ?', [req.body, req.params], function(err, results) {
-			if (results.affectedRows) {
-				connection.query('SELECT * from Users WHERE ?', req.params, function(err, rows) {
+		var table = map_table(req.params.table);
+		var id = build_id(req);
+
+
+		connection.query('UPDATE ' + table + ' SET ? WHERE ?', [req.body, id], function(err, results) {
+			if (err){
+				console.log('Error while performing query.');
+				res.send({
+					'message': 'There has been a problem with the server.',
+					'errno': err.errno
+				});
+			} if (results.affectedRows) {
+				connection.query('SELECT * from ' + table + ' WHERE ?', id, function(err, rows) {
 					if (!err) {
 						res.send({
 							'message': 'success',
-							'user': rows
+							'updated': rows
 						});
 						//connection.end();
 					} else {
@@ -172,15 +272,9 @@ app.route('/v1/users/:userId')
 					}
 				});
 			} else if (!results.affectedRows){
-				console.log('There are no users with the requested userId.');
+				console.log('There are no ' + req.params.table + ' with the requested id.');
 				res.send({
-					'message': 'There are no users with the requested userId.'
-				});
-			} else if (err){
-				console.log('Error while performing query.');
-				res.send({
-					'message': 'There has been a problem with the server.',
-					'errno': err.errno
+					'message': 'There are no ' + req.params.table + ' with the requested id.'
 				});
 			}
 		});
@@ -189,8 +283,18 @@ app.route('/v1/users/:userId')
 	.delete(function(req, res) {
 		//connection.connect();
 
-		connection.query('DELETE FROM Users WHERE ?', req.params, function(err, results) {
-			if (results.affectedRows) {
+		var table = map_table(req.params.table);
+		var id = build_id(req);
+
+
+		connection.query('DELETE FROM ' + table + ' WHERE ?', id, function(err, results) {
+			if (err) {
+				console.log('Error while performing query.');
+				res.send({
+					'message': 'There has been a problem with the server.',
+					'errno': err.errno
+				});
+			} if (results.affectedRows) {
 
 				console.log(results);
 				res.send({
@@ -198,18 +302,10 @@ app.route('/v1/users/:userId')
 				});
 				//connection.end();
 			} else if (!results.affectedRows) {
-				console.log('There are no users with the requested userId.');
+				console.log('There are no ' + req.params.table + ' with the requested id.');
 				res.send({
-					'message': 'There are no users with the requested userId.'
-				});
-			} else if (err) {
-				console.log('Error while performing query.');
-				res.send({
-					'message': 'There has been a problem with the server.',
-					'errno': err.errno
+					'message': 'There are no ' + req.params.table + ' with the requested id.'
 				});
 			}
 		});
 	});
-
-

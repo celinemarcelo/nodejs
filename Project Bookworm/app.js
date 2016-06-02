@@ -10,17 +10,28 @@ var connection = mysql.createConnection({
 	database: conf.get('database')
 });
 
+var map_table = function(table) {
+	var set = ['users', 'books', 'authors', 'categories', 'languages', 'reviews', 'favorites'];
+
+	if (set.indexOf(table) > -1){
+		//console.log('found');
+		return table.charAt(0).toUpperCase() + table.slice(1);
+	} else if (table === 'reviewcomments') {
+		return 'ReviewComments';
+	}
+}
+
+
 app = express();
 app.use(bodyParser.json());
 
 app.listen(8004);
 
 
-//Users Table
-
-app.route('/v1/users')
+app.route('/v1/:table')
 	.get(function(req, res) {
 		//connection.connect();
+		var table = map_table(req.params.table);
 
 		var limit = '';
 
@@ -30,21 +41,23 @@ app.route('/v1/users')
 			limit = ' LIMIT ' + req.query.offset.toString() + ',' + req.query.limit.toString();
 		}
 
-		connection.query('SELECT * from Users' + limit, function(err, rows, fields) {
-			if (rows.length) {
-				res.send({
-					"users": rows
-				});
-				//connection.end();
-			} else if (!rows.length){
-				console.log('There are no registered users.');
-				res.send({
-					"message": "There are no registered users."
-				});
-			} else if (err){
+		connection.query('SELECT * from ' + table + limit, function(err, rows, fields) {
+			console.log(req.params.table);
+
+			if (err) {
 				console.log('Error while performing query.');
+				console.log(err);
 				res.send({
-					"message": "There has been a problem with the server."
+					'message': 'There has been a problem with the server.',
+					'errno': err.errno
+				});
+			} else if (rows.length) {
+				res.send(rows);
+				//connection.end
+			} else if (!rows.length) {
+				console.log('There are no ' + req.params.table + ' on this database.');
+				res.send({
+					'message': 'There are no ' + req.params.table + ' on this database.'
 				});
 			}
 		});
@@ -58,49 +71,54 @@ app.route('/v1/users')
 		};
 
 		connection.query('SELECT * from Users WHERE ?', {'username': req.body.username}, function(err, results) {
-			if (results.length) {
+			if (err) {
+				console.log('Error while performing query.');
 				res.send({
-					"message": "Username already taken."
+					'message': 'There has been a problem with the server.',
+					'errno': err.errno
 				});
+			} else if (results.length) {
+				res.send({
+					'message': 'Username already taken.'
+				}); 
 			} else if (!results.length) {
 				connection.query('INSERT INTO Users SET ?', merge(req.body, timestamp), function(err, results) {
 					if (!err) {
 						res.send({
-							"message": "success",
-							"userId": results.insertId
+							'message': 'success',
+							'userId': results.insertId
 						});
 						//connection.end();
 					} else {
 						console.log('Error while performing query.');
 						res.send({
-							"message": "There has been a problem with the server."
+							'message': 'There has been a problem with the server.',
+							'errno': err.errno 
 						});
 					}
 				});
-			} else if (err) {
-				console.log('Error while performing query.');
-				res.send({
-					"message": "There has been a problem with the server."
-				});
-			} 
-
+			}
 		});
-
 	})
 
 	.delete(function(req, res) {
 		//connection.connect();
 
-		connection.query('TRUNCATE Users', function(err) {
+		var table = map_table(req.params.table);
+
+
+		connection.query('TRUNCATE ' + table, function(err) {
 			if (!err) {
 				res.send({
-					"message": "success"
+					'message': 'success'
 				});
 				//connection.end();
 			} else {
+				console.log(err);
 				console.log('Error while performing query.');
 				res.send({
-					"message": "There has been a problem with the server."
+					'message': 'There has been a problem with the server.',
+					'errno': err.errno
 				});
 			}
 		});
@@ -114,18 +132,20 @@ app.route('/v1/users/:userId')
 		connection.query('SELECT * from Users WHERE ?', req.params, function(err, rows, fields) {
 			if (rows.length) {
 				res.send({
-					"user": rows
+					'user': rows
 				});
 				//connection.end();
 			} else if (!rows.length){
 				console.log('There are no users with the requested userId.');
 				res.send({
-					"message": "There are no users with the requested userId."
+					'message': 'There are no users with the requested userId.'
 				});
 			} else if (err){
 				console.log('Error while performing query.');
 				res.send({
-					"message": "There has been a problem with the server."
+					'message': 'There has been a problem with the server.',
+					'errno': err.errno
+
 				});
 			}
 		});
@@ -139,26 +159,28 @@ app.route('/v1/users/:userId')
 				connection.query('SELECT * from Users WHERE ?', req.params, function(err, rows) {
 					if (!err) {
 						res.send({
-							"message": "success",
-							"user": rows
+							'message': 'success',
+							'user': rows
 						});
 						//connection.end();
 					} else {
 						console.log('Error while performing query.');
 						res.send({
-							"message": "There has been a problem with the server."
+							'message': 'There has been a problem with the server.',
+							'errno': err.errno
 						});
 					}
 				});
 			} else if (!results.affectedRows){
 				console.log('There are no users with the requested userId.');
 				res.send({
-					"message": "There are no users with the requested userId."
+					'message': 'There are no users with the requested userId.'
 				});
 			} else if (err){
 				console.log('Error while performing query.');
 				res.send({
-					"message": "There has been a problem with the server."
+					'message': 'There has been a problem with the server.',
+					'errno': err.errno
 				});
 			}
 		});
@@ -172,18 +194,19 @@ app.route('/v1/users/:userId')
 
 				console.log(results);
 				res.send({
-					"message": "success"
+					'message': 'success'
 				});
 				//connection.end();
 			} else if (!results.affectedRows) {
 				console.log('There are no users with the requested userId.');
 				res.send({
-					"message": "There are no users with the requested userId."
+					'message': 'There are no users with the requested userId.'
 				});
 			} else if (err) {
 				console.log('Error while performing query.');
 				res.send({
-					"message": "There has been a problem with the server."
+					'message': 'There has been a problem with the server.',
+					'errno': err.errno
 				});
 			}
 		});

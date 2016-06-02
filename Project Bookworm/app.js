@@ -16,15 +16,17 @@ app.use(bodyParser.json());
 app.listen(8004);
 
 
+//Users Table
+
 app.route('/v1/users')
 	.get(function(req, res) {
 		//connection.connect();
 
 		var limit = '';
 
-		if (req.query.count != undefined) {
+		if (req.query.count) {
 			limit  = ' LIMIT ' + req.query.count.toString();
-		} else if (req.query.offset != undefined && req.query.limit != undefined){
+		} else if (req.query.offset && req.query.limit){
 			limit = ' LIMIT ' + req.query.offset.toString() + ',' + req.query.limit.toString();
 		}
 
@@ -55,7 +57,7 @@ app.route('/v1/users')
 			registrationDate: new Date()
 		};
 
-		connection.query('SELECT * from Users WHERE username = ' + "'" + req.body.username + "'", function(err, results) {
+		connection.query('SELECT * from Users WHERE ?', {'username': req.body.username}, function(err, results) {
 			if (results.length) {
 				res.send({
 					"message": "Username already taken."
@@ -109,7 +111,7 @@ app.route('/v1/users/:userId')
 	.get(function(req, res) {
 		//connection.connect();
 
-		connection.query('SELECT * from Users WHERE userId = ' + req.params.userId, function(err, rows, fields) {
+		connection.query('SELECT * from Users WHERE ?', req.params, function(err, rows, fields) {
 			if (rows.length) {
 				res.send({
 					"user": rows
@@ -132,9 +134,9 @@ app.route('/v1/users/:userId')
 	.put(function(req, res) {
 		//connection.connect();
 
-		connection.query('UPDATE Users SET ? WHERE userId = ' + req.params.userId, req.body, function(err, results) {
+		connection.query('UPDATE Users SET ? WHERE ?', [req.body, req.params], function(err, results) {
 			if (results.affectedRows) {
-				connection.query('SELECT * from Users WHERE userId = ' + req.params.userId, function(err, rows) {
+				connection.query('SELECT * from Users WHERE ?', req.params, function(err, rows) {
 					if (!err) {
 						res.send({
 							"message": "success",
@@ -165,13 +167,20 @@ app.route('/v1/users/:userId')
 	.delete(function(req, res) {
 		//connection.connect();
 
-		connection.query('DELETE FROM Users WHERE userId = ' + req.params.userId, function(err) {
-			if (!err) {
+		connection.query('DELETE FROM Users WHERE ?', req.params, function(err, results) {
+			if (results.affectedRows) {
+
+				console.log(results);
 				res.send({
 					"message": "success"
 				});
 				//connection.end();
-			} else {
+			} else if (!results.affectedRows) {
+				console.log('There are no users with the requested userId.');
+				res.send({
+					"message": "There are no users with the requested userId."
+				});
+			} else if (err) {
 				console.log('Error while performing query.');
 				res.send({
 					"message": "There has been a problem with the server."
@@ -179,3 +188,5 @@ app.route('/v1/users/:userId')
 			}
 		});
 	});
+
+

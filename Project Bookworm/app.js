@@ -98,7 +98,7 @@ var build_id = function(req) {
 }
 
 
-app = express();
+var app = express();
 app.use(bodyParser.json());
 
 app.listen(8004);
@@ -117,7 +117,7 @@ app.route('/v1/:table')
 			limit = ' LIMIT ' + req.query.offset.toString() + ',' + req.query.limit.toString();
 		}
 
-		connection.query('SELECT * from ' + table + limit, function(err, rows, fields) {
+		connection.query('SELECT * from ' + table + limit, function(err, results) {
 			console.log(req.params.table);
 
 			if (err) {
@@ -127,10 +127,13 @@ app.route('/v1/:table')
 					'message': 'There has been a problem with the server.',
 					'errno': err.errno
 				});
-			} else if (rows.length) {
-				res.send(rows);
+			} else if (results.length) {
+				var json = {};
+				json[req.params.table] = results;
+
+				res.send(json);
 				//connection.end
-			} else if (!rows.length) {
+			} else if (!results.length) {
 				console.log('There are no ' + req.params.table + ' on this database.');
 				res.send({
 					'message': 'There are no ' + req.params.table + ' on this database.'
@@ -147,7 +150,7 @@ app.route('/v1/:table')
 		var args = build_args(req);
 
 		console.log(body);
-		
+
 
 		connection.query('SELECT * from ' + table + ' WHERE ?', args, function(err, results) {
 			if (err) {
@@ -219,17 +222,28 @@ app.route('/v1/:table/:id')
 		var table = map_table(req.params.table);
 		var id = build_id(req);
 		
+		console.log(req.query.fields);
 
-		connection.query('SELECT * from ' + table + ' WHERE ?', id, function(err, rows, fields) {
+		var columns = req.query.fields.split(',');
+
+		connection.query('SELECT ?? from ' + table + ' WHERE ?', [columns, id], function(err, rows, fields) {
 			 if (err){
 				console.log('Error while performing query.');
+				console.log(err);
 				res.send({
 					'message': 'There has been a problem with the server.',
 					'errno': err.errno
 
 				});
-			} if (rows.length) {
-				res.send(rows);
+			} else if (rows.length) {
+				var json = {};
+				
+				if (table === 'Categories') {
+					json['category'] = rows;
+				} else {
+					json[req.params.table.slice(0, table.length - 1)] = rows;
+				}
+				res.send(json);
 				//connection.end();
 
 			} else if (!rows.length){
@@ -258,10 +272,16 @@ app.route('/v1/:table/:id')
 			} if (results.affectedRows) {
 				connection.query('SELECT * from ' + table + ' WHERE ?', id, function(err, rows) {
 					if (!err) {
-						res.send({
-							'message': 'success',
-							'updated': rows
-						});
+						var json = {};
+						if (table === 'Categories') {
+							json['category'] = rows;
+						} else {
+							json[req.params.table.slice(0, table.length - 1)] = rows;
+						}
+
+
+						var msg = {'message': 'success'};
+						res.send(merge(msg, json));
 						//connection.end();
 					} else {
 						console.log('Error while performing query.');

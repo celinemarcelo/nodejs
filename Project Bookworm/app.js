@@ -222,11 +222,8 @@ app.route('/v1/:table/:id')
 		var table = map_table(req.params.table);
 		var id = build_id(req);
 		
-		console.log(req.query.fields);
 
-		var columns = req.query.fields.split(',');
-
-		connection.query('SELECT ?? from ' + table + ' WHERE ?', [columns, id], function(err, rows, fields) {
+		connection.query('SELECT * from ' + table + ' WHERE ?', id, function(err, rows, fields) {
 			 if (err){
 				console.log('Error while performing query.');
 				console.log(err);
@@ -237,12 +234,31 @@ app.route('/v1/:table/:id')
 				});
 			} else if (rows.length) {
 				var json = {};
-				
-				if (table === 'Categories') {
+
+				if (req.query.fields != undefined) {
+					var columns = req.query.fields.split(',');
+
+					columns.forEach(function(item, index) {
+						var data = {};
+
+						data[item] = rows[0][item];
+
+						if (table === 'Categories') {
+							json['category'] = merge(json.category, data);
+						} else {
+							json[req.params.table.slice(0, table.length - 1)] = merge(json[req.params.table.slice(0, table.length - 1)], data);
+						}
+
+					});
+				} else if (table === 'Categories') {
 					json['category'] = rows;
 				} else {
+
 					json[req.params.table.slice(0, table.length - 1)] = rows;
+
 				}
+
+
 				res.send(json);
 				//connection.end();
 

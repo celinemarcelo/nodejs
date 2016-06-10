@@ -20,7 +20,7 @@ var map_table = function(table) {
 	} else if (table === 'reviewcomments') {
 		return 'ReviewComments';
 	}
-}
+};
 
 var build_body = function(req) {
 	var set = ['books', 'authors', 'categories', 'languages', 'reviews'];
@@ -40,31 +40,32 @@ var build_body = function(req) {
 	} else if (req.params.table === 'users') {
 		return merge(req.body, registrationDate);
 	}
-}
+};
 
 var build_args = function(req) {
 	var t = req.params.table
 
 	switch(t) {
 		case 'users':
-			return {'username': req.body.username};
+			return "username = '" + req.body.username + "'";
 			break;
 		case 'books':
-			return {'title': req.body.title, 'author': req.body.author};
+			return "title = '" + req.body.title + "' AND author = '" + req.body.author + "'";
 			break;
 		case 'authors':
-			return {'firstName': req.body.firstName, 'lastName': req.body.lastName};
+			return "firstName = '" + req.body.firstName + "' AND lastName = '" + req.body.lastName + "'";
 			break;
 		case 'categories':
-			return {'categoryName': req.body.categoryName};
+			return "categoryName = '" + req.body.categoryName + "'";
 			break;
 		case 'languages':
-			return {'language': req.body.language};
+			return "language = '" + req.body.language + "'";
 			break;
 		case 'favorites':
-			return {'user': req.body.user, 'book': req.body.book};
+			return "user = " + req.body.user + " AND book = " + req.body.book;
 	}
-}
+};
+
 
 var build_id = function(req) {
 	var t = req.params.table
@@ -95,13 +96,47 @@ var build_id = function(req) {
 			return {'reviewId': req.params.id};
 			break;
 	}
-}
+};
+
+var search_params = function(req) {
+	var t = req.params.table
+
+	switch(t) {
+		case 'users':
+			return "username = '" + req.query.username + "'";
+			break;
+		case 'books':
+			return "title = '" + req.query.title + "' AND author = '" + req.query.author + "'";
+			break;
+		case 'authors':
+			return "firstName = '" + req.query.firstName + "' AND lastName = '" + req.query.lastName + "'";
+			break;
+		case 'categories':
+			return "categoryName = '" + req.query.categoryName + "'";
+			break;
+		case 'languages':
+			return "language = '" + req.query.language + "'";
+			break;
+		case 'favorites':
+			return "user = " + req.query.user + " AND book = " + req.query.book;
+	}
+};
 
 
 var app = express();
 app.use(bodyParser.json());
 
 app.listen(8004);
+
+
+app.all('/*', function(req, res, next) {
+	res.setHeader("Access-Control-Allow-Origin", "*");
+	res.setHeader("Access-Control-Allow-Credentials", "true");
+	res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+	res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+	next();
+});
+
 
 
 app.route('/v1/:table')
@@ -149,10 +184,7 @@ app.route('/v1/:table')
 		var body = build_body(req);
 		var args = build_args(req);
 
-		console.log(body);
-
-
-		connection.query('SELECT * from ' + table + ' WHERE ?', args, function(err, results) {
+		connection.query('SELECT * from ' + table + ' WHERE ' + args, function(err, results) {
 			if (err) {
 				console.log('Error while performing query.');
 				res.send({
@@ -213,6 +245,37 @@ app.route('/v1/:table')
 			}
 		});
 	});
+
+
+app.route('/v1/:table/search')
+	.get(function(req, res) {
+		var table = map_table(req.params.table);
+		var params = search_params(req);
+
+		console.log(params);
+		connection.query('SELECT * from ' + table + ' WHERE ' + params, function(err, rows, fields) {
+			if (err){
+				console.log('Error while performing query.');
+				console.log(err);
+				res.send({
+					'message': 'There has been a problem with the server.',
+					'errno': err.errno
+				});
+			} else if (rows.length) {
+				res.send(rows);
+
+			} else if (!rows.length){
+				console.log('There are no ' + req.params.table + ' with the requested parameters.');
+				res.send({
+					'message': 'There are no ' + req.params.table + ' with the requested parameters.'
+				});
+			}	
+
+		});
+
+
+	});
+
 
 
 app.route('/v1/:table/:id')
@@ -345,3 +408,7 @@ app.route('/v1/:table/:id')
 			}
 		});
 	});
+
+
+
+	

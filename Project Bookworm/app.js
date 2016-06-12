@@ -160,7 +160,8 @@ app.route('/v1/:table')
 				console.log(err);
 				res.send({
 					'message': 'There has been a problem with the server.',
-					'errno': err.errno
+					'errno': err.errno,
+					'err': err
 				});
 			} else if (results.length) {
 				var json = {};
@@ -184,14 +185,16 @@ app.route('/v1/:table')
 		var body = build_body(req);
 		var args = build_args(req);
 
-		connection.query('SELECT * from ' + table + ' WHERE ' + args, function(err, results) {
+		connection.query('SELECT * from ' + table + ' WHERE ' + args, function(err, rows, fields) {
 			if (err) {
 				console.log('Error while performing query.');
+				console.log(err);
 				res.send({
 					'message': 'There has been a problem with the server.',
-					'errno': err.errno
+					'errno': err.errno,
+					'err': err
 				});
-			} else if (results.length) {
+			} else if (rows.length) {
 				var msg;
 
 				if (table === 'Categories') {
@@ -200,10 +203,15 @@ app.route('/v1/:table')
 					msg = table.slice(0, table.length - 1);
 				}
 
+				console.log(fields);
+
+
+
 				res.send({
-					'message':  msg + ' already exists.'
+					'message':  msg + ' already exists.',
+					'id': rows[0][fields[0].name]
 				}); 
-			} else if (!results.length) {
+			} else if (!rows.length) {
 				connection.query('INSERT INTO ' + table + ' SET ?', body, function(err, results) {
 
 					if (!err) {
@@ -214,9 +222,12 @@ app.route('/v1/:table')
 						//connection.end();
 					} else {
 						console.log('Error while performing query.');
+						console.log(err);
+
 						res.send({
 							'message': 'There has been a problem with the server.',
-							'errno': err.errno 
+							'errno': err.errno,
+							'err': err 
 						});
 					}
 				});
@@ -240,7 +251,8 @@ app.route('/v1/:table')
 				console.log('Error while performing query.');
 				res.send({
 					'message': 'There has been a problem with the server.',
-					'errno': err.errno
+					'errno': err.errno,
+					'err': err
 				});
 			}
 		});
@@ -259,7 +271,8 @@ app.route('/v1/:table/search')
 				console.log(err);
 				res.send({
 					'message': 'There has been a problem with the server.',
-					'errno': err.errno
+					'errno': err.errno,
+					'err': err
 				});
 			} else if (rows.length) {
 				res.send(rows);
@@ -292,7 +305,8 @@ app.route('/v1/:table/:id')
 				console.log(err);
 				res.send({
 					'message': 'There has been a problem with the server.',
-					'errno': err.errno
+					'errno': err.errno,
+					'err': err
 
 				});
 			} else if (rows.length) {
@@ -346,7 +360,8 @@ app.route('/v1/:table/:id')
 				console.log('Error while performing query.');
 				res.send({
 					'message': 'There has been a problem with the server.',
-					'errno': err.errno
+					'errno': err.errno,
+					'err': err
 				});
 			} if (results.affectedRows) {
 				connection.query('SELECT * from ' + table + ' WHERE ?', id, function(err, rows) {
@@ -366,7 +381,8 @@ app.route('/v1/:table/:id')
 						console.log('Error while performing query.');
 						res.send({
 							'message': 'There has been a problem with the server.',
-							'errno': err.errno
+							'errno': err.errno,
+							'err': err
 						});
 					}
 				});
@@ -391,7 +407,8 @@ app.route('/v1/:table/:id')
 				console.log('Error while performing query.');
 				res.send({
 					'message': 'There has been a problem with the server.',
-					'errno': err.errno
+					'errno': err.errno,
+					'err': err
 				});
 			} if (results.affectedRows) {
 

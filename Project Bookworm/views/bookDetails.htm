@@ -1,0 +1,22 @@
+		<div style="width: 70%; margin: auto">
+			<div class="RobotoRegular">
+				<ol class="breadcrumb">
+					<li><a href="#/">Home</a></li>
+  					<li><a href="#/books">Books</a></li>
+  					<li class="active">{{title}}</li>
+				</ol>
+			</div>
+
+			<div style="float: left;">
+				<img style="height: 50%" ng-src="http://assets.celinemarcelo.com/projectbookworm/covers/{{bookId}}.jpg" class="img-responsive logo"/>
+			</div>
+
+			<div>
+				<h2 style="text-align: center;font-weight: bold" class="RobotoThin">{{title}}</h2>
+				<div class="RobotoRegular" style="text-align: center;">
+					Author: {{authorName}} |
+					Category: {{categoryName}} |
+					Language: {{language}}
+				</div>
+			</div>
+		</div>

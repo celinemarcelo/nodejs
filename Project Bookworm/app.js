@@ -1,9 +1,16 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var url = require('url');
-var conf = require('./config');
 var merge = require('merge');
 var mysql = require('mysql');
+var fs = require('fs');
+var http = require('http');
+var multer = require('multer');
+var s3 = require( 'multer-storage-s3' );
+
+var users = require('./users');
+var conf = require('./config');
+
 var connection = mysql.createConnection({
 	host: conf.get('host'),
 	user: conf.get('user'),
@@ -137,7 +144,45 @@ app.all('/*', function(req, res, next) {
 	next();
 });
 
+app.use('/v1', users);
+ 
 
+app.post('/v1/upload/:id', function(req, res){
+	var storage = s3({
+		destination : function( req, file, cb ) {
+			
+			cb( null, 'projectbookworm/covers' );
+			
+		},
+		filename    : function( req, file, cb ) {
+			
+			cb( null, req.params.id + '.jpg');
+			
+		},
+		bucket      : conf.get('bucket'),
+		region      : conf.get('region')
+	});
+
+
+
+	var upload = multer({
+		storage: storage
+	}).single('file');
+
+
+	upload(req,res,function(err){
+            if(err){
+            	console.log(err);
+                res.json({error_code: 1,err_desc:err});
+                return;
+            }
+            res.json({error_code: 0,err_desc:null});
+        });
+
+	console.log(req.file);
+
+
+});
 
 app.route('/v1/:table')
 	.get(function(req, res) {

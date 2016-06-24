@@ -16,6 +16,18 @@ var conf = convict({
 	database: {
 		format: String,
 		default: 'projectbookworm'
+	},
+	region: {
+		format: String,
+		default: 'ap-northeast-1'	
+	},
+	bucket: {
+		format: String,
+		default: 'assets.celinemarcelo.com'	
+	},
+	secret: {
+		format: String,
+		default: 'AllHailArceus'	
 	}
 });
 

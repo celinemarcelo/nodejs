@@ -11,3 +11,75 @@
 .spinner {
 	margin-top: 230px;
 }
+
+body {
+	padding-top: 70px;
+}
+
+@font-face {
+    font-family: Bebas;
+    src: url("http://assets.celinemarcelo.com/projectbookworm/BebasNeue.otf");
+}
+
+@font-face {
+    font-family: Mobile;
+    src: url("http://assets.celinemarcelo.com/projectbookworm/MobileSans.ttf");
+}
+
+@font-face {
+    font-family: RobotoThin;
+    src: url("http://assets.celinemarcelo.com/projectbookworm/Roboto-Thin.ttf");
+}
+
+@font-face {
+    font-family: RobotoBlack;
+    src: url("http://assets.celinemarcelo.com/projectbookworm/Roboto-Black.ttf");
+}
+
+@font-face {
+    font-family: RobotoRegular;
+    src: url("http://assets.celinemarcelo.com/projectbookworm/Roboto-Regular.ttf");
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+table > a {
+  color: red;
+}
+
+.Bebas {
+  font-family: Bebas;
+}
+
+.Mobile {
+  font-family: Mobile;
+}
+
+.RobotoThin {
+  font-family: RobotoThin;
+}
+
+.RobotoRegular {
+  font-family: RobotoRegular;
+}
+
+.RobotoBlack {
+  font-family: RobotoBlack;
+}
+
+.logo {  
+  -webkit-transition: 400ms;
+  -moz-transition-duration: 400ms;
+  -o-transition-duration: 400ms;
+  transition-duration: 400ms;
+}
+
+.logo:hover {
+  opacity:.7;
+}
+
+.navbar-default .navbar-nav > li > a:focus {
+  color:#da4b4b;
+}

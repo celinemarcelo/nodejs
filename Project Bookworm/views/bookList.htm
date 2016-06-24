@@ -1,0 +1,162 @@
+
+		<div style="width: 70%; margin: auto;"> 
+			<h1 align="center" class="RobotoBlack"> Book List </h1>
+			<div style="position: relative">
+				<!-- Trigger the modal with a button -->
+				<div style="text-align: right">
+					<button type="button" class="btn btn-success btn-lg RobotoRegular" data-toggle="modal" data-target="#addBook">
+						<small><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></small>
+						Add Book
+					</button>
+				</div>
+				<!-- Modal -->
+				<div id="addBook" class="modal fade RobotoRegular" role="dialog">
+					<div class="modal-dialog">
+						<!-- Modal content-->
+						<div class="overlay" ng-show="showSpinner">
+							<div ng-show="showSpinner" align="center" class="spinner">
+								<img src="http://assets.celinemarcelo.com/projectbookworm/ajax-loader.gif">
+							</div>
+
+						</div>
+						<div class="modal-content">
+							<div class="modal-header">
+								<h4 class="modal-title">Add Book</h4>
+							</div>
+							<div class="modal-body">
+
+								<form ng-hide="success || fail || exists" name="bookForm" novalidate>
+									<div class="form-group">
+										<label for="title">Title<span style="color: red">*</span></label>
+										<input type="text" class="form-control" name="title" ng-model="title" uib-typeahead="book.title for book in books | filter:$viewValue | limitTo:3" required>
+
+									</div>
+									<div class="form-group">
+										<label>Author<span style="color: red">*</span></label><br>
+
+										<div style="float: left; width: 45%">
+											<label for="firstName" style="font-weight: normal">First Name<span style="color: red">*</span></label><br>
+											<input type="text" class="form-control" name="firstName" ng-model="firstName" uib-typeahead="author.firstName for author in authors | filter:$viewValue | limitTo:3" required>
+										</div>
+										<div style="float: right; width: 45%">
+											<label for="lastName" style="font-weight: normal">Last Name<span style="color: red">*</span></label><br>
+											<input type="text" class="form-control" name="lastName" ng-model="lastName" uib-typeahead="author.lastName for author in authors | filter:$viewValue | limitTo:3" required>
+										</div>
+									</div>
+									
+									<br><br><br>
+									
+									<div>
+										<div class="form-group"  style="width: 45%; float: left">
+											<label for="category">Category<span style="color: red">*</span></label>
+											<!--<select ng-model="selectedCategory" ng-options="x.categoryName for x in categories"></select>-->
+											<input type="text" class="form-control" ng-model="categoryName" name="categoryName" uib-typeahead="category.categoryName for category in categories | filter:$viewValue | limitTo:3" required>
+										</div>
+										<div class="form-group" style="width: 45%; float: right">
+											<label for="language">Language<span style="color: red">*</span></label>
+											<!--<select ng-model="selectedLanguage" ng-options="x.language for x in languages"></select>-->
+											<input type="text" class="form-control" ng-model="language" name="language" uib-typeahead="language.language for language in languages | filter:$viewValue | limitTo:3" required>
+										</div>
+									</div>
+									<div>
+										<div class="form-group" style="width: 45%; float: left">
+											<label for="releaseDate">Release Date</label>
+											<input type="date" class="form-control" id="releaseDate" ng-model="releaseDate">
+										</div>
+										
+										<div class="form-group" style="width: 45%; float: right">
+												<label for="coverURL">Cover Image</label>
+											     <input type="file" ngf-select ng-model="file" name="file" ngf-pattern="'image/*'" accept="image/*" ngf-max-size="10MB" ngf-resize="{width: 260, height: 400, quality: 1.0}"/>
+
+										</div>
+									</div>
+
+
+								</form>
+
+								
+							</div>
+
+							
+							<div class="alert alert-success" ng-show="success">
+								<span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+
+								<strong>Book successfully added!</strong>
+							</div>
+
+							<div class="alert alert-warning" ng-show="exists">
+								<span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+								
+								<strong>Book already exists!</strong>
+							</div>
+
+							<div class="alert alert-danger" ng-show="fail">
+							  	<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+
+								<strong>There has been a problem with the server.</strong>
+							</div>
+
+							<div class="alert alert-success" ng-show="coverSuccess">
+								<span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+
+								<strong>Cover image successfully uploaded!</strong>
+							</div>
+
+							<div class="alert alert-danger" ng-show="coverFail">
+							  	<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+
+								<strong>Cover image upload failed.</strong>
+							</div>
+
+
+							<div class="modal-footer" style="margin-top: 20%;" ng-hide="success || fail || exists">
+								<em><span style="float: left; color: red;">*required</span></em>
+
+								<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+								<button type="submit" class="btn btn-info" ng-click="submit($scope.file)" ng-disabled="bookForm.title.$invalid || bookForm.firstName.$invalid || bookForm.lastName.$invalid || bookForm.categoryName.$invalid || bookForm.language.$invalid">Submit</button>
+							</div>
+
+
+							<div class="modal-footer" style="margin-top: 20%;" ng-show="success || fail || exists">
+								<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+								<button type="button" class="btn btn-warning" ng-click="success = 0; fail = 0; exists = 0; coverSuccess = 0; coverFail = 0;" >Back to form</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<br>
+
+			<div>
+
+				<div ng-show="showSpinnerTable" align="center" class="spinner">
+					<img src="http://assets.celinemarcelo.com/projectbookworm/ajax-loader.gif">
+				</div>
+
+				<div class="table-responsive RobotoRegular" ng-hide="showSpinnerTable" ng-cloak>
+					<table class="table table-striped">
+			  			<thead>
+			  				<th>Title</th>
+			  				<th>Author</th>
+			  				<th>Category</th>
+			  			</thead>
+
+			  			<tr ng-repeat="x in books | orderBy: 'title'" class="well">
+
+			    			<td style="vertical-align: middle">
+			    				<a ng-href="#/books/{{x.bookId}}">
+			    					<img style="height: 40%;" class="logo" ng-src="http://assets.celinemarcelo.com/projectbookworm/covers/{{x.bookId}}.jpg" />
+			    				</a>
+			    			<a ng-href="#/books/{{x.bookId}}" style="font-weight: bold">{{x.title}}</a></td>
+			    			<td style="vertical-align: middle" get-author></td>
+			    			<td style="vertical-align: middle" get-category></td>
+			  			</tr>
+					</table>
+				</div>
+
+			</div>
+
+		</div>
+
+		

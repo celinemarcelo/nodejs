@@ -1,0 +1,149 @@
+		<div style="margin: auto; width: 70%">	
+			<h1 align="center" class="RobotoBlack"> This is the login page. </h1>
+
+			<div class="well RobotoRegular" style="text-align: center">
+				<h4>I'm hard at work figuring this out. Please be patient! :)</h4>
+			</div>
+
+			<div class="well RobotoRegular">
+				<div style="text-align: center">
+					<button type="button" class="btn btn-success btn-lg RobotoRegular" id="newButton" ng-click="!newUser" style="text-align: center">
+						<small><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span></small>
+						New User
+					</button>
+					<button type="button" class="btn btn-info btn-lg RobotoRegular" data-toggle="modal" data-target="#login">
+						<small><span class="glyphicon glyphicon-user" aria-hidden="true"></span></small>
+						Login
+					</button>
+				</div>
+				<!-- Modal -->
+				<div id="newUser" class="modal fade RobotoRegular" ng-show="newUser">
+					<div>
+						<!-- Modal content-->
+						<div class="overlay" ng-show="showNewSpinner">
+							<div ng-show="showNewSpinner" align="center" class="spinner RobotoBlack">
+								<span style="color: white; font-size: 200%">Making your account...</span><br>
+
+								<img src="http://assets.celinemarcelo.com/projectbookworm/ajax-loader.gif">
+							</div>
+
+						</div>
+						<div>
+							<div>
+								<h4>Make an account</h4>
+							</div>
+							<div>
+
+								<form ng-hide="success || fail || exists" name="newUser" novalidate>
+									<div class="form-group">
+										<label for="username">Username<span style="color: red">*</span></label>
+										<input type="text" class="form-control" name="newUsername" ng-model="newUsername" required>
+
+										<br>
+
+										<label for="password">Password<span style="color: red">*</span></label>
+										<input type="password" class="form-control" name="newPassword" ng-model="newPassword" required>
+
+										<br>
+
+										<label for="confPassword">Confirm password<span style="color: red">*</span></label>
+										<input type="password" class="form-control" name="confPassword" ng-model="confPassword" required>
+
+										<br>
+
+										<div ng-show="noMatch" class="alert alert-danger">
+											<span class="glyphicon glyphicon-remove-sign" aria-hidden="true"></span>
+											Passwords don't match!
+										</div>
+
+										<div ng-show="newExists" class="alert alert-warning">
+											<span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+											Username is already taken. Please choose another one.
+										</div>
+
+										<div ng-show="newFail" class="alert alert-danger">
+											<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+											There has been a problem with the server.
+										</div>
+									</div>
+
+
+								</form>
+
+								
+							</div>
+							<divstyle="margin-top: 20%;">
+								<em><span style="float: left; color: red;">*required</span></em>
+
+								<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+								<button type="submit" class="btn btn-info" ng-click="submit()" ng-disabled="newUser.newUsername.$invalid || newUser.newPassword.$invalid || newUser.confPassword.$invalid">Submit</button>
+							</div>
+						</div>
+					</div>
+
+
+
+
+
+			</div>
+
+			<!-- Modal -->
+				<div id="login" class="modal fade RobotoRegular" role="dialog">
+					<div class="modal-dialog">
+						<!-- Modal content-->
+						<div class="overlay" ng-show="showSpinner">
+							<div ng-show="showSpinner" align="center" class="spinner">
+								<img src="http://assets.celinemarcelo.com/projectbookworm/ajax-loader.gif">
+							</div>
+
+						</div>
+						<div class="modal-content">
+							<div class="modal-header">
+								<h4 class="modal-title">Login</h4>
+							</div>
+							<div class="modal-body">
+
+								<form ng-hide="success || fail || exists" name="login" novalidate>
+									<div class="form-group">
+										<label for="username">Username</label>
+										<input type="text" class="form-control" name="username" ng-model="username" required>
+
+										<br>
+
+										<label for="password">Password</label>
+										<input type="password" class="form-control" name="password" ng-model="password" required>
+									</div>
+
+
+								</form>
+
+								
+							</div>
+							<div class="modal-footer" style="margin-top: 20%;" ng-hide="success || fail || exists">
+
+								<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+								<button type="submit" class="btn btn-info" ng-click="submit($scope.file)" ng-disabled="bookForm.title.$invalid || bookForm.firstName.$invalid || bookForm.lastName.$invalid || bookForm.categoryName.$invalid || bookForm.language.$invalid">Login</button>
+							</div>
+
+
+							<div class="modal-footer" style="margin-top: 20%;" ng-show="success || fail || exists">
+								<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+								<button type="button" class="btn btn-warning" ng-click="success = 0; fail = 0; exists = 0; coverSuccess = 0; coverFail = 0;" >Back to form</button>
+							</div>
+						</div>
+					</div>
+
+
+
+					
+
+			</div>
+
+
+
+		</div>
+
+		
+		
+		
+		

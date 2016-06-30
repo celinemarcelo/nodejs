@@ -3,7 +3,6 @@ var bodyParser = require('body-parser');
 var url = require('url');
 var merge = require('merge');
 var mysql = require('mysql');
-var fs = require('fs');
 var http = require('http');
 var multer = require('multer');
 var s3 = require( 'multer-storage-s3' );
@@ -140,7 +139,7 @@ app.all('/*', function(req, res, next) {
 	res.setHeader("Access-Control-Allow-Origin", "*");
 	res.setHeader("Access-Control-Allow-Credentials", "true");
 	res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
-	res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+	res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, X-Session-Token");
 	next();
 });
 

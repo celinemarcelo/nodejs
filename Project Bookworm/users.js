@@ -25,42 +25,63 @@ router.post('/authenticate', function(req, res) {
 
 
 	console.log(req.body);
-	connection.query('SELECT * from Users WHERE ?', params, function(err, results) {
-		console.log(results);
 
-		if(results.length > 0){
-			console.log('User found!');
+	if (req.body.token) {
+		jwt.verify(req.body.token, secret, function(err, decoded){
 
-			if (req.body.password === results[0].password) {
-				console.log('User authenticated.');
-				var json = {};
-
-				merge(json, results[0]);
-
-				var token = jwt.sign(json, secret, {
-					expiresIn: "1 day"
-				});
-
+			if(!err){
 				res.json({
-					message: 'authenticated',
-					token: token
-				});
-
+					message:"Authenticated! Token accepted."
+				});	
 			} else {
-				console.log('Wrong password!');
-				res.send({
-					message: 'Wrong password!'
+				res.json({
+					message: "Login failed. Please try again."
 				});
 			}
-
-		} else {
-			console.log('Username not found.');
-			res.send('Username not found.');
-		}
-	});
+		});
 
 
+	} else {
+		connection.query('SELECT * from Users WHERE ?', params, function(err, results) {
+			console.log(results);
 
+			if (results.length > 0) {
+				console.log('User found!');
+
+				if (req.body.password === results[0].password) {
+					console.log('User authenticated.');
+					
+
+					
+					var json = {};
+
+					merge(json, results[0]);
+
+					var token = jwt.sign(json, secret, {
+						expiresIn: "1 day"
+					});
+
+					res.json({
+						message: "Authenticated! Token issued.",
+						token: token
+					});
+					
+
+				} else {
+					console.log('Wrong password!');
+					res.send({
+						message: 'Wrong password!'
+					});
+				}
+
+			} else {
+				console.log('Username not found.');
+				res.send({
+					message: 'Username not found.'
+				});
+			}
+		});
+	}
 });
 
 
@@ -68,13 +89,13 @@ router.route('/users')
 	.get(function(req, res) {
 		//connection.connect();
 
-		
-		
+
+
 		var limit = '';
 
 		if (req.query.count) {
-			limit  = ' LIMIT ' + req.query.count.toString();
-		} else if (req.query.offset && req.query.limit){
+			limit = ' LIMIT ' + req.query.count.toString();
+		} else if (req.query.offset && req.query.limit) {
 			limit = ' LIMIT ' + req.query.offset.toString() + ',' + req.query.limit.toString();
 		}
 
@@ -103,72 +124,82 @@ router.route('/users')
 		});
 	})
 
-	.post(function(req, res) {
-		//connection.connect();
+.post(function(req, res) {
+	//connection.connect();
 
-		connection.query('SELECT * from Users WHERE username = ' + req.body.username, function(err, rows, fields) {
-			if (err) {
-				console.log('Error while performing query.');
-				console.log(err);
-				res.send({
-					'message': 'There has been a problem with the server.',
-					'errno': err.errno,
-					'err': err
-				});
-			} else if (rows.length) {
+	console.log(req.body);
 
-				console.log(fields);
+	connection.query('SELECT * from Users WHERE username = ?', [req.body.username], function(err, rows, fields) {
+		if (err) {
+			console.log('Error while performing query.');
+			console.log(err);
+			res.send({
+				'message': 'There has been a problem with the server.',
+				'errno': err.errno,
+				'err': err
+			});
+		} else if (rows.length) {
+
+			console.log(fields);
 
 
 
-				res.send({
-					'message':  'User already exists.',
-					'id': rows[0][fields[0].name]
-				}); 
-			} else if (!rows.length) {
-				connection.query('INSERT INTO Users SET ?', req.body, function(err, results) {
+			res.send({
+				'message': 'User already exists.',
+				'id': rows[0][fields[0].name]
+			});
+		} else if (!rows.length) {
+			var regDate = {
+				registrationDate: new Date()
+			};
 
-					if (!err) {
-						res.send({
-							'message': 'success',
-							'id': results.insertId
-						});
-						//connection.end();
-					} else {
-						console.log('Error while performing query.');
-						console.log(err);
+			merge(req.body, regDate);
 
-						res.send({
-							'message': 'There has been a problem with the server.',
-							'errno': err.errno,
-							'err': err 
-						});
-					}
-				});
-			}
-		});
-	})
 
-	.delete(function(req, res) {
-		//connection.connect();
 
-		connection.query('TRUNCATE Users', function(err) {
-			if (!err) {
-				res.send({
-					'message': 'success'
-				});
-				//connection.end();
-			} else {
-				console.log(err);
-				console.log('Error while performing query.');
-				res.send({
-					'message': 'There has been a problem with the server.',
-					'errno': err.errno,
-					'err': err
-				});
-			}
-		});
+			connection.query('INSERT INTO Users SET ?', req.body, function(err, results) {
+
+				if (!err) {
+					res.send({
+						'message': 'success',
+						'id': results.insertId
+					});
+					//connection.end();
+				} else {
+					console.log('Error while performing query.');
+					console.log(err);
+
+					res.send({
+						'message': 'There has been a problem with the server.',
+						'errno': err.errno,
+						'err': err
+					});
+				}
+			});
+		}
 	});
+})
+
+.delete(function(req, res) {
+	//connection.connect();
+
+	connection.query('TRUNCATE Users', function(err) {
+		if (!err) {
+			res.send({
+				'message': 'success'
+			});
+			//connection.end();
+		} else {
+			console.log(err);
+			console.log('Error while performing query.');
+			res.send({
+				'message': 'There has been a problem with the server.',
+				'errno': err.errno,
+				'err': err
+			});
+		}
+	});
+});
 
 
 router.route('/v1/users/search')
@@ -179,7 +210,7 @@ router.route('/v1/users/search')
 
 		console.log(params);
 		connection.query('SELECT * from Users WHERE ' + params, function(err, rows, fields) {
-			if (err){
+			if (err) {
 				console.log('Error while performing query.');
 				console.log(err);
 				res.send({
@@ -190,12 +221,12 @@ router.route('/v1/users/search')
 			} else if (rows.length) {
 				res.send(rows);
 
-			} else if (!rows.length){
+			} else if (!rows.length) {
 				console.log('There are no users with the requested username.');
 				res.send({
 					'message': 'There are no users with the requested username.'
 				});
-			}	
+			}
 
 		});
 
@@ -213,7 +244,7 @@ router.route('/v1/users/:id')
 		}
 
 		connection.query('SELECT * from Users WHERE ?', id, function(err, rows, fields) {
-			 if (err){
+			if (err) {
 				console.log('Error while performing query.');
 				console.log(err);
 				res.send({
@@ -246,7 +277,7 @@ router.route('/v1/users/:id')
 				res.send(json);
 				//connection.end();
 
-			} else if (!rows.length){
+			} else if (!rows.length) {
 				console.log('There are no users with the requested id.');
 				res.send({
 					'message': 'There are no users with the requested id.'
@@ -255,80 +286,83 @@ router.route('/v1/users/:id')
 		});
 	})
 
-	.put(function(req, res) {
-		//connection.connect();
+.put(function(req, res) {
+	//connection.connect();
 
-		var id = {
-			userId: req.params.id
+	var id = {
+		userId: req.params.id
+	}
+
+	connection.query('UPDATE Users SET ? WHERE ?', [req.body, id], function(err, results) {
+		if (err) {
+			console.log('Error while performing query.');
+			res.send({
+				'message': 'There has been a problem with the server.',
+				'errno': err.errno,
+				'err': err
+			});
 		}
-
-		connection.query('UPDATE Users SET ? WHERE ?', [req.body, id], function(err, results) {
-			if (err){
-				console.log('Error while performing query.');
-				res.send({
-					'message': 'There has been a problem with the server.',
-					'errno': err.errno,
-					'err': err
-				});
-			} if (results.affectedRows) {
-				connection.query('SELECT * from Users WHERE ?', id, function(err, rows) {
-					if (!err) {
-						var json = {};
-						json.user = rows;
+		if (results.affectedRows) {
+			connection.query('SELECT * from Users WHERE ?', id, function(err, rows) {
+				if (!err) {
+					var json = {};
+					json.user = rows;
 
 
-						var msg = {'message': 'success'};
-						res.send(merge(msg, json));
-						//connection.end();
-					} else {
-						console.log('Error while performing query.');
-						res.send({
-							'message': 'There has been a problem with the server.',
-							'errno': err.errno,
-							'err': err
-						});
-					}
-				});
-			} else if (!results.affectedRows){
-				console.log('There are no users with the requested id.');
-				res.send({
-					'message': 'There are no users with the requested id.'
-				});
-			}
-		});
-	})
-
-	.delete(function(req, res) {
-		//connection.connect();
-
-		var id = {
-			userId: req.params.id
+					var msg = {
+						'message': 'success'
+					};
+					res.send(merge(msg, json));
+					//connection.end();
+				} else {
+					console.log('Error while performing query.');
+					res.send({
+						'message': 'There has been a problem with the server.',
+						'errno': err.errno,
+						'err': err
+					});
+				}
+			});
+		} else if (!results.affectedRows) {
+			console.log('There are no users with the requested id.');
+			res.send({
+				'message': 'There are no users with the requested id.'
+			});
 		}
-
-		connection.query('DELETE FROM Users WHERE ?', id, function(err, results) {
-			if (err) {
-				console.log('Error while performing query.');
-				res.send({
-					'message': 'There has been a problem with the server.',
-					'errno': err.errno,
-					'err': err
-				});
-			} if (results.affectedRows) {
-
-				console.log(results);
-				res.send({
-					'message': 'success'
-				});
-				//connection.end();
-			} else if (!results.affectedRows) {
-				console.log('There are no users with the requested id.');
-				res.send({
-					'message': 'There are no users with the requested id.'
-				});
-			}
-		});
 	});
+})
+
+.delete(function(req, res) {
+	//connection.connect();
+
+	var id = {
+		userId: req.params.id
+	}
+
+	connection.query('DELETE FROM Users WHERE ?', id, function(err, results) {
+		if (err) {
+			console.log('Error while performing query.');
+			res.send({
+				'message': 'There has been a problem with the server.',
+				'errno': err.errno,
+				'err': err
+			});
+		}
+		if (results.affectedRows) {
+
+			console.log(results);
+			res.send({
+				'message': 'success'
+			});
+			//connection.end();
+		} else if (!results.affectedRows) {
+			console.log('There are no users with the requested id.');
+			res.send({
+				'message': 'There are no users with the requested id.'
+			});
+		}
+	});
+});
 
 
 module.exports = router;
-	

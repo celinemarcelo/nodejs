@@ -93,6 +93,7 @@ router.route('/users')
 
 		var limit = '';
 
+		// THIS IS BOUND FOR SQL INJECTION
 		if (req.query.count) {
 			limit = ' LIMIT ' + req.query.count.toString();
 		} else if (req.query.offset && req.query.limit) {
@@ -150,6 +151,7 @@ router.route('/users')
 			});
 		} else if (!rows.length) {
 			var regDate = {
+				// USER MYSQL TIMESTAMP with NOW() as default instead
 				registrationDate: new Date()
 			};
 
@@ -180,6 +182,7 @@ router.route('/users')
 	});
 })
 
+// SUPPORT DELETE BY ID INSTEAD
 .delete(function(req, res) {
 	//connection.connect();
 

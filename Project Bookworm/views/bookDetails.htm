@@ -8,7 +8,8 @@
 			</div>
 
 			<div style="float: left;">
-				<img style="height: 50%" ng-src="http://assets.celinemarcelo.com/projectbookworm/covers/{{bookId}}.jpg" class="img-responsive logo"/>
+
+				<img id="myImg" style="height: 50%" ng-src="http://assets.celinemarcelo.com/projectbookworm/covers/{{bookId}}.jpg" class="img-responsive logo" ng-click="open()"/>
 			</div>
 
 			<div>
@@ -18,5 +19,15 @@
 					Category: {{categoryName}} |
 					Language: {{language}}
 				</div>
+
+				<div style="text-align: right">
+					<button class="btn btn-warning btn-lg RobotoRegular">
+						<small><span class="glyphicon" ng-class="{'glyphicon-star': inFavorites === 'Unfavorite', 'glyphicon-star-empty': inFavorites === 'Favorite'}" aria-hidden="true"></span></small>{{inFavorites}}
+					</button>
+				</div>
 			</div>
+
+			
 		</div>
+
+

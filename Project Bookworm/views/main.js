@@ -1,4 +1,4 @@
-var app = angular.module('app', ['ui.router', 'ui.bootstrap', 'ngFileUpload', 'angular-jwt', 'ngAnimate']);
+var app = angular.module('app', ['ui.router', 'ui.bootstrap', 'ngFileUpload', 'angular-jwt', 'ngAnimate', 'angularUtils.directives.dirPagination']);
 
 			app.factory('tokenInjector', function ($window){
 				return {
@@ -116,6 +116,33 @@ var app = angular.module('app', ['ui.router', 'ui.bootstrap', 'ngFileUpload', 'a
 			                    return deferred.promise;
 			                }
 				    	}
+				    })
+
+				    .state("favoriteList", {
+				    	url: "/favorites",
+				    	title: "My Favorites",
+				    	templateUrl: "favoriteList.htm",
+				    	controller: "favoriteList",
+				    	resolve: {
+			                login: function($q, $http, $state) {
+			                    var deferred = $q.defer();
+			                    $http({
+									method: "POST",
+									url: "http://celinemarcelo.com:8004/v1/authenticate"
+								}).success(function(data, status){
+									
+									if (data.success === "ok") {
+
+										deferred.resolve();
+									} else {
+										deferred.reject();
+									}
+								});	
+
+			                   
+			                    return deferred.promise;
+			                }
+				    	}
 				    });
 
 
@@ -147,6 +174,7 @@ var app = angular.module('app', ['ui.router', 'ui.bootstrap', 'ngFileUpload', 'a
 
 						} else {
 							$rootScope.loggedIn = false;
+							delete $window.localStorage.token;
 						}
 					});		
 					

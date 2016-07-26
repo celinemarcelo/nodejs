@@ -1,0 +1,102 @@
+
+					<!-- Modal content-->
+					<div class="overlay" ng-show="showSpinner">
+						<div ng-show="showSpinner" align="center" class="spinner">
+							<img src="http://assets.celinemarcelo.com/projectbookworm/ajax-loader.gif">
+						</div>
+
+					</div>
+					<div>
+						<div class="modal-header">
+							<h4 class="modal-title RobotoRegular">Account Settings</h4>
+						</div>
+						<div class="modal-body RobotoRegular">
+							<ul class="nav nav-tabs">
+							    <li ng-class="{active: tab == 1}">
+							    	<a ng-click="tab = 1" style="cursor: pointer">Profile</a>	
+							    </li>
+							    <li ng-class="{active: tab == 2}">
+							    	<a ng-click="tab = 2" style="cursor: pointer">Delete account</a>
+							    </li>
+							 </ul>
+							
+						</div>
+
+
+						<div class="tab-content RobotoRegular">
+							<div id="profile" ng-show="tab == 1" style="width: 80%; margin: auto">
+								<form ng-hide="success || fail || deleted">
+						    		<label for="newUsername">Change username</label>
+						    		<br>
+									<input type="text" class="form-control" id="newUsername" ng-model="newUsername">
+
+									<div ng-show="exists">
+										<br>
+										<div class="alert alert-warning">
+										  	<span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+
+											<strong>Username is already taken.</strong>
+										</div>
+									</div>
+									
+
+									<hr>
+									<label for="newPassword">New password</label>
+									<br>
+									<input type="text" class="form-control" id="newPassword" ng-model="newPassword">
+									<br>
+									<label for="confPass">Confirm new password</label>
+									<input type="text" class="form-control" id="confPass" ng-model="confPass">
+
+									<div ng-show="noMatch">
+										<br>
+										<div class="alert alert-danger" ng-show="noMatch">
+											<span class="glyphicon glyphicon-remove-sign" aria-hidden="true"></span>
+											Passwords don't match!
+										</div>
+									</div>
+									
+									<br>
+									<div style="text-align: right">
+										<button type="submit" class="btn btn-info" ng-click="save()">Save Changes</button>
+									</div>
+									
+						    	</form>
+
+							</div>
+
+							<div id="delete" ng-show="tab == 2 && !deleted" style="width: 80%; margin: auto">
+								<br>
+						    	<div style="text-align: center">
+						    		<button class="btn btn-danger" ng-click="delete()">
+								    	Yes, I would like to delete my account.
+								    </button>
+								    <br><br><br>
+						    	</div>
+							</div>
+
+						</div>
+
+						<div class="alert alert-success" ng-show="deleted">
+							<span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+
+							<strong>Account successfully deleted! Please wait for a few seconds...</strong>
+						</div>
+						
+						<div class="alert alert-success" ng-show="success">
+							<span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+
+							<strong>Profile successfully updated! Please wait for a few seconds...</strong>
+						</div>
+
+						<div class="alert alert-danger" ng-show="fail">
+						  	<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+
+							<strong>There has been a problem with the server.</strong>
+						</div>
+
+
+						<div class="modal-footer" ng-hide="fail || exists">
+							<button type="button" class="btn btn-default" ng-click="cancel()">Cancel</button>
+						</div>
+					</div>

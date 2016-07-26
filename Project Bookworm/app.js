@@ -16,6 +16,7 @@ var conf = require('./config')
 //-4 - token not accepted
 //-5 - db error
 //-6 - upload error
+//-7 - forbidden
 
 
 var app = express();
@@ -25,10 +26,9 @@ app.listen(8004);
 
 app.use('/v1', cors); 
 
-
 app.use('/v1', expressJwt({
 	secret: conf.get('secret')
-}).unless({path: [{url: '/v1/users', methods: ['OPTIONS', 'POST']}, '/v1/authenticate', '/v1/books']}));
+}).unless({path: [{url: '/v1/users', methods: ['OPTIONS', 'POST', 'GET']}, '/v1/authenticate', '/v1/reviews/search']}));
 
 
 
@@ -46,8 +46,16 @@ app.route('/v1/:table')
 
 	.post(cb.tablePostCb);
 
+app.get('/v1/favorites/search', cb.favoriteSearchCb);
+app.get('/v1/reviews/search', cb.reviewSearchCb);
+app.get('/v1/reviewcomments/search', cb.revCommentSearchCb);
+
+
 app.route('/v1/:table/search')
 	.get(cb.searchCb);
+
+app.route('/v1/:table/count')
+	.get(cb.countCb);
 
 app.route('/v1/:table/:id')
 	.get(cb.idGetCb)

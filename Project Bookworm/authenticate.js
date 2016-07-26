@@ -48,17 +48,19 @@ module.exports.authenticate = function(req, res) {
 
 				if (req.body.password === results[0].password) {
 					
-					if (results[0].username === "celine"){
+					if (results[0].userId === 1){
 						var json = {
-							userId: '1',
-							username: 'celine',
+							userId: results[0].userId,
+							username: results[0].username,
+							password: results[0].password,
 							registrationDate: results[0].registrationDate,
-							admin: 'true'
+							admin: true
 						};	
 					} else {
 						var json = {
 							userId: results[0].userId,
 							username: results[0].username,
+							password: results[0].password,
 							registrationDate: results[0].registrationDate,
 							admin: false
 						};	

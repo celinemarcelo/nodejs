@@ -31,30 +31,6 @@ module.exports.build_body = function(req) {
 	}
 };
 
-module.exports.build_args = function(req) {
-	var t = req.params.table
-
-	switch(t) {
-		case 'users':
-			return "username = '" + req.body.username + "'";
-			break;
-		case 'books':
-			return "title = '" + req.body.title + "' AND author = '" + req.body.author + "'";
-			break;
-		case 'authors':
-			return "firstName = '" + req.body.firstName + "' AND lastName = '" + req.body.lastName + "'";
-			break;
-		case 'categories':
-			return "categoryName = '" + req.body.categoryName + "'";
-			break;
-		case 'languages':
-			return "language = '" + req.body.language + "'";
-			break;
-		case 'favorites':
-			return "user = " + req.body.user + " AND book = " + req.body.book;
-	}
-};
-
 
 module.exports.build_id = function(req) {
 	var t = req.params.table
@@ -86,28 +62,3 @@ module.exports.build_id = function(req) {
 			break;
 	}
 };
-
-module.exports.search_params = function(req) {
-	var t = req.params.table
-
-	switch(t) {
-		case 'users':
-			return "username = '" + req.query.username + "'";
-			break;
-		case 'books':
-			return "title = '" + req.query.title + "' AND author = '" + req.query.author + "'";
-			break;
-		case 'authors':
-			return "firstName = '" + req.query.firstName + "' AND lastName = '" + req.query.lastName + "'";
-			break;
-		case 'categories':
-			return "categoryName = '" + req.query.categoryName + "'";
-			break;
-		case 'languages':
-			return "language = '" + req.query.language + "'";
-			break;
-		case 'favorites':
-			return "user = " + req.query.user + " AND book = " + req.query.book;
-	}
-};
-

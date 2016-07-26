@@ -1,27 +1,15 @@
+				
 
-		<div style="width: 70%; margin: auto;"> 
-			<h1 align="center" class="RobotoBlack"> Book List </h1>
-			<div style="position: relative">
-				<!-- Trigger the modal with a button -->
-				<div style="text-align: right">
-					<button type="button" class="btn btn-success btn-lg RobotoRegular" data-toggle="modal" data-target="#addBook" ng-show="isAdmin">
-						<small><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></small>
-						Add Book
-					</button>
-				</div>
-				<!-- Modal -->
-				<div id="addBook" class="modal fade RobotoRegular" role="dialog">
-					<div class="modal-dialog">
-						<!-- Modal content-->
+
 						<div class="overlay" ng-show="showSpinner">
 							<div ng-show="showSpinner" align="center" class="spinner">
 								<img src="http://assets.celinemarcelo.com/projectbookworm/ajax-loader.gif">
 							</div>
 
 						</div>
-						<div class="modal-content">
+						
 							<div class="modal-header">
-								<h4 class="modal-title RobotoRegular">Add Book</h4>
+								<h4 class="modal-title RobotoRegular">Edit {{title}}</h4>
 							</div>
 							<div class="modal-body RobotoRegular">
 
@@ -81,7 +69,7 @@
 							<div class="alert alert-success" ng-show="success">
 								<span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
 
-								<strong>Book successfully added!</strong>
+								<strong>Book successfully updated!</strong>
 							</div>
 
 							<div class="alert alert-warning" ng-show="exists">
@@ -99,7 +87,7 @@
 							<div class="alert alert-success" ng-show="coverSuccess">
 								<span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
 
-								<strong>Cover image successfully uploaded!</strong>
+								<strong>Cover image successfully uploaded! Please wait for a few seconds...</strong>
 							</div>
 
 							<div class="alert alert-danger" ng-show="coverFail">
@@ -121,48 +109,5 @@
 								<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 								<button type="button" class="btn btn-warning" ng-click="success = 0; fail = 0; exists = 0; coverSuccess = 0; coverFail = 0;" >Back to form</button>
 							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<br>
-
-			<div>
-
-				<div ng-show="showSpinnerTable" align="center" class="spinner">
-					<img src="http://assets.celinemarcelo.com/projectbookworm/ajax-loader.gif">
-				</div>
-
-				<div class="table-responsive RobotoRegular" ng-hide="showSpinnerTable" ng-cloak>
-					<table class="table table-striped">
-						<div style="text-align: center">
-							<uib-pagination total-items="totalItems" ng-model="currentPage" max-size="maxSize"  num-pages="numPages" items-per-page="7" ng-change="pageChanged(currentPage)"></uib-pagination>
-						</div>
-			  			<thead>
-			  				<th>Title</th>
-			  				<th>Author</th>
-			  				<th>Category</th>
-			  			</thead>
-
-			  			<tr ng-repeat="x in books | orderBy: 'title'" class="well">
-
-			    			<td style="vertical-align: middle">
-			    				<a ng-href="#/books/{{x.bookId}}">
-			    					<img style="height: 40%;" class="logo" ng-src="http://assets.celinemarcelo.com/projectbookworm/covers/{{x.bookId}}.jpg" />
-			    				</a>
-			    			<a ng-href="#/books/{{x.bookId}}" style="font-weight: bold">{{x.title}}</a></td>
-			    			<td style="vertical-align: middle" get-author></td>
-			    			<td style="vertical-align: middle" get-category></td>
-			  			</tr>
-					</table>
-					<div style="text-align: center">
-						<uib-pagination total-items="totalItems" ng-model="currentPage" max-size="maxSize"  num-pages="numPages" items-per-page="7" ng-change="pageChanged(currentPage)"></uib-pagination>
-					</div>
-				</div>
-
-			</div>
-
-		</div>
-
-		
+						
+					

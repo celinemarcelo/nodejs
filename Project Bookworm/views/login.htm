@@ -31,7 +31,7 @@
 							</div>
 							<div>
 
-								<form name="newUser" novalidate>
+								<form name="newUser" novalidate ng-submit="submit()">
 									<div class="form-group">
 										<label for="username">Username<span style="color: red">*</span></label>
 										<input type="text" class="form-control" name="newUsername" ng-model="newUsername" required>
@@ -63,17 +63,17 @@
 											There has been a problem with the server.
 										</div>
 									</div>
+									<div style="text-align: right">
+										<em><span style="float: left; color: red;">*required</span></em>
 
+										<button type="submit" class="btn btn-info" ng-disabled="newUser.newUsername.$invalid || newUser.newPassword.$invalid || newUser.confPassword.$invalid">Submit</button>
+									</div>
 
 								</form>
 
 								
 							</div>
-							<div style="margin-top: 20%; text-align: right">
-								<em><span style="float: left; color: red;">*required</span></em>
-
-								<button type="submit" class="btn btn-info" ng-click="submit()" ng-disabled="newUser.newUsername.$invalid || newUser.newPassword.$invalid || newUser.confPassword.$invalid">Submit</button>
-							</div>
+							
 						</div>
 					</div>
 				</div>
@@ -98,7 +98,7 @@
 							</div>
 							<div>
 
-								<form name="login" novalidate>
+								<form name="login" novalidate ng-submit="loginFunc()">
 									<div class="form-group">
 										<label for="username">Username</label>
 										<input type="text" class="form-control" name="username" ng-model="username" required>
@@ -116,15 +116,17 @@
 										</div>
 									</div>
 
+									<div style="text-align: right">
+
+										<button type="submit" class="btn btn-info"  ng-disabled="login.username.$invalid || login.password.$invalid">Login</button>
+									</div>
+
 
 								</form>
 
 								
 							</div>
-							<div style="margin-top: 20%; text-align: right">
-
-								<button type="submit" class="btn btn-info" ng-click="loginFunc()" ng-disabled="login.username.$invalid || login.password.$invalid">Login</button>
-							</div>
+							
 						</div>
 					</div>
 				</div>

@@ -1,0 +1,79 @@
+
+					<!-- Modal content-->
+					<div class="overlay" ng-show="showSpinner">
+						<div ng-show="showSpinner" align="center" class="spinner">
+							<img src="http://assets.celinemarcelo.com/projectbookworm/ajax-loader.gif">
+						</div>
+
+					</div>
+					<div>
+						<div class="modal-header">
+							<h4 class="modal-title RobotoRegular">{{makeReview}} for <b>{{title}}</b></h4>
+						</div>
+						<div class="modal-body RobotoRegular">
+							<div class="alert alert-danger" ng-show="deleteReviewAlert">
+								<b>Are you sure you want to delete this review?</b>
+								<a style="cursor: pointer" ng-click="yes()">Yes</a>
+								/
+								<a style="cursor: pointer" ng-click="no()">No</a>
+							</div>
+							<form ng-hide="success || fail || exists || deleted" name="reviewForm" novalidate>
+								<div class="pull-right">
+									<button class="btn btn-danger" ng-click="deleteReview()" ng-show="{{makeReview === 'Edit your review'}}">
+										Delete this review
+									</button>
+								</div>
+								<div class="form-group">											<label for="rating">Rating<span style="color: red">*</span>		</label>
+									<br>
+									<uib-rating ng-model="rating" max="5" style="color: yellow;"></uib-rating>
+
+									<br><br>
+
+
+									<label for="review">Review<span style="color: red">* <span style="font-size: 90%">({{2000 - review.length}} characters left)</span></span></label>
+									<textarea rows="7" style="max-width: 100%" class="form-control" name="review" ng-model="review" ng-maxlength="2000" required></textarea>
+								</div>
+								
+							</form>
+
+							
+						</div>
+
+						<div class="alert alert-success" ng-show="deleted">
+							<span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+
+							<strong>Review successfully deleted! Please wait for a few seconds...</strong>
+						</div>
+						
+						<div class="alert alert-success" ng-show="success">
+							<span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+
+							<strong>Review successfully added! Please wait for a few seconds...</strong>
+						</div>
+
+						
+						<div class="alert alert-danger" ng-show="fail">
+						  	<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+
+							<strong>There has been a problem with the server.</strong>
+						</div>
+
+						<div class="alert alert-danger" ng-show="exists">
+						  	<span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+
+							<strong>You have already reviewed this book. Please refresh the page.</strong>
+						</div>
+
+
+						<div class="modal-footer" style="margin-top: 20%;" ng-hide="success || fail || exists">
+							<em><span style="float: left; color: red;">*required</span></em>
+
+							<button type="button" class="btn btn-default" ng-click="cancel()">Cancel</button>
+							<button type="submit" class="btn btn-info" ng-click="submit()" ng-disabled="reviewForm.review.$invalid || reviewForm.rating.$invalid">Submit</button>
+						</div>
+
+
+						<div class="modal-footer" style="margin-top: 20%;" ng-show="success || fail || exists">
+							<button type="button" class="btn btn-default" ng-click="cancel()">Close</button>
+						</div>
+					</div>
